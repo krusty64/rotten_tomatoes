@@ -1,0 +1,7 @@
+key.go is missing as your api key is private!
+
+create key.go with the following contents:
+
+package rotten_tomatoes
+
+const rtkey := "<your-api-key>"
