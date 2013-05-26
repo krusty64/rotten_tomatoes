@@ -6,9 +6,9 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	c, err := InitSetup()
-	if err != nil {
-		t.Error(err)
+	c := InitSetup()
+	if c == nil {
+		t.Fatal("Initialization failed")
 	}
 
 	if c.Links.Movies == "" {

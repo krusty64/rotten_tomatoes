@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func findMovie(title string, year int, c *Config, t *testing.T) *RottenTomatoMovie {
+func findMovie(title string, year int, c *Config, t *testing.T) *Movie {
 	match, err := c.FindMovie(title, year)
 	if err != nil {
 		t.Error(err)
@@ -21,9 +21,9 @@ func findMovie(title string, year int, c *Config, t *testing.T) *RottenTomatoMov
 }
 
 func testInit(t *testing.T) *Config {
-	c, err := InitSetup()
-	if err != nil {
-		t.Fatal(err)
+	c := InitSetup()
+	if c == nil {
+		t.Fatal("Initialization failed")
 	}
 	return c
 }
@@ -64,7 +64,7 @@ func TestActors(t *testing.T) {
 }
 
 func TestScoredMovies(t *testing.T) {
-	m := &RottenTomatoMovie{Year: 1980}
+	m := &Movie{Year: 1980}
 	s := []scoredMovie{
 		{4, 0.0, m},
 		{4, 0.0, m},

@@ -4,6 +4,12 @@ Rotten tomato API for go (golang)
 Uses the [API](http://developer.rottentomatoes.com/docs) to access
 movie data from rotten tomatoes.
 
+WARNING
+-------
+
+Rotten Tomatoes does not give the 'synopsis' field. Basically there is no way
+of getting the plot.
+
 
 Setup
 -----

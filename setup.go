@@ -3,6 +3,7 @@ package rotten_tomatoes
 import (
 	"log"
 	"net/url"
+	"sync"
 	"utils/json"
 )
 
@@ -30,23 +31,34 @@ func (c *Config) AddKey(inUrl string) (string, error) {
 	return u.String(), nil
 }
 
-func InitSetup() (*Config, error) {
+var globalConfigLock sync.Mutex
+var globalConfig *Config
+
+func GetConfig() *Config {
+	if globalConfig != nil {
+		return globalConfig
+	}
+
+	globalConfigLock.Lock()
+	defer globalConfigLock.Unlock()
+
 	// Fills out Links.Movies and Links.Lists
 	var config Config
 	err := json.FromUrl(init_query+api_key, &config)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		return nil
 	}
 
 	if config.Links.Movies != "" {
 		// Fills out LinkTemplate
 		err = json.FromUrl(config.Links.Movies+api_key, &config)
 		if err != nil {
-			return nil, err
+			log.Println(err)
 		} else {
 			u, err := url.Parse(config.LinkTemplate)
 			if err != nil {
-				return nil, err
+				log.Println(err)
 			} else {
 				q := u.Query()
 				q.Set("page_limit", "10")
@@ -55,10 +67,11 @@ func InitSetup() (*Config, error) {
 				u.RawQuery = q.Encode()
 
 				config.LinkUrl = u
-				log.Printf("%+v\n", u.Query())
+
+				globalConfig = &config
 			}
 		}
 	}
 
-	return &config, nil
+	return globalConfig
 }

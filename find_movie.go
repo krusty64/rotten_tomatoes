@@ -10,13 +10,13 @@ import (
 	"utils/strtools"
 )
 
-type RottenTomatoActor struct {
+type Actor struct {
 	Name       string
 	Id         string
 	Characters []string
 }
 
-type RottenTomatoMovie struct {
+type Movie struct {
 	Id      string
 	Title   string
 	Year    int
@@ -31,8 +31,8 @@ type RottenTomatoMovie struct {
 		Detailed  string
 		Original  string
 	}
-	AbridgedCast []RottenTomatoActor `json:"abridged_cast"`
-	FullCast     []RottenTomatoActor `json:"cast"`
+	AbridgedCast []Actor `json:"abridged_cast"`
+	FullCast     []Actor `json:"cast"`
 	AlternateIds struct {
 		Imdb string
 	} `json:"alternate_ids"`
@@ -47,7 +47,7 @@ type RottenTomatoMovie struct {
 	}
 }
 
-func (r *RottenTomatoMovie) GetFullCast(c *Config) error {
+func (r *Movie) GetFullCast(c *Config) error {
 	if r.Links.Cast == "" {
 		return nil
 	}
@@ -64,7 +64,7 @@ func (r *RottenTomatoMovie) GetFullCast(c *Config) error {
 type RottenTomatoMovies struct {
 	Total int
 
-	Movies []*RottenTomatoMovie
+	Movies []*Movie
 
 	Links struct {
 		Self string
@@ -80,7 +80,7 @@ type movie_match struct {
 	year  int
 }
 
-func (m *movie_match) scoreMatch(movie *RottenTomatoMovie) (int, float32) {
+func (m *movie_match) scoreMatch(movie *Movie) (int, float32) {
 	titledist := strtools.LevenshteinDistanceCustom(m.title, movie.Title,
 		1.0, 1.0, 0.3, strtools.EqualRuneFold)
 
@@ -102,7 +102,7 @@ func (m *movie_match) scoreMatch(movie *RottenTomatoMovie) (int, float32) {
 type scoredMovie struct {
 	score int
 	dist  float32
-	movie *RottenTomatoMovie
+	movie *Movie
 }
 
 type scoredMovieSorter struct {
@@ -123,8 +123,8 @@ func (s *scoredMovieSorter) Less(i, j int) bool {
 	}
 }
 
-func selectBest(matches []scoredMovie) []*RottenTomatoMovie {
-	var result []*RottenTomatoMovie
+func selectBest(matches []scoredMovie) []*Movie {
+	var result []*Movie
 	if len(matches) == 1 {
 		result = append(result, matches[0].movie)
 	} else if len(matches) > 0 {
@@ -147,7 +147,7 @@ func selectBest(matches []scoredMovie) []*RottenTomatoMovie {
 	return result
 }
 
-func (c *Config) FindMovie(title string, year int) ([]*RottenTomatoMovie, error) {
+func (c *Config) FindMovie(title string, year int) ([]*Movie, error) {
 	q := c.LinkUrl.Query()
 	q.Set("q", title)
 
